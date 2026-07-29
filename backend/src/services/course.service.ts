@@ -19,7 +19,10 @@ export const createCourse = async (data: {
   price: number;
   duration: string;
   level: "Beginner" | "Intermediate" | "Advanced";
-  thumbnail?: string;
+  thumbnail?: {
+  url: string;
+  publicId: string;
+};
 }) => {
 
   const existingCourse = await Course.findOne({

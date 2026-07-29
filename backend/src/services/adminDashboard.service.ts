@@ -1,92 +1,3 @@
-// import Student from "../models/student.model";
-// import Course from "../models/course.model";
-// import Enrollment from "../models/enrollment.model";
-// import Certificate from "../models/certificate.model";
-// import Payment from "../models/payment.model";
-// import Module from "../models/module.model";
-// import Lesson from "../models/lesson.model";
-
-// export const getDashboardStatistics = async () => {
-
-//   const [
-
-//     students,
-//     courses,
-//     modules,
-//     lessons,
-//     enrollments,
-//     certificates,
-//     payments,
-
-//     recentStudents,
-//     recentEnrollments,
-//     recentPayments,
-
-//   ] = await Promise.all([
-
-//     Student.countDocuments(),
-
-//     Course.countDocuments(),
-
-//     Module.countDocuments(),
-
-//     Lesson.countDocuments(),
-
-//     Enrollment.countDocuments(),
-
-//     Certificate.countDocuments(),
-
-//     Payment.countDocuments({
-//       status: "success",
-//     }),
-
-//     Student.find()
-//       .sort({ createdAt: -1 })
-//       .limit(5),
-
-//     Enrollment.find()
-//       .populate("student")
-//       .populate("course")
-//       .sort({ createdAt: -1 })
-//       .limit(5),
-
-//     Payment.find()
-//       .sort({ createdAt: -1 })
-//       .limit(5),
-
-//   ]);
-
-//   return {
-
-//     statistics: {
-
-//       students,
-
-//       courses,
-
-//       modules,
-
-//       lessons,
-
-//       enrollments,
-
-//       certificates,
-
-//       payments,
-
-//     },
-
-//     recentStudents,
-
-//     recentEnrollments,
-
-//     recentPayments,
-
-//   };
-
-// };
-
-
 import Student from "../models/student.model";
 import Course from "../models/course.model";
 import Enrollment from "../models/enrollment.model";
@@ -94,6 +5,7 @@ import Certificate from "../models/certificate.model";
 import Payment from "../models/payment.model";
 import Module from "../models/module.model";
 import Lesson from "../models/lesson.model";
+import { PAYMENT_STATUS } from "../constants/payment";
 
 export const getDashboardStatistics = async () => {
 
@@ -156,22 +68,22 @@ export const getDashboardStatistics = async () => {
     Certificate.countDocuments(),
 
     Payment.countDocuments({
-      status: "paid",
-    }),
+  status: PAYMENT_STATUS.SUCCESS,
+}),
 
     Payment.countDocuments({
-      status: "pending",
-    }),
+  status: PAYMENT_STATUS.PENDING,
+}),
 
     Payment.countDocuments({
-      status: "failed",
-    }),
+  status: PAYMENT_STATUS.FAILED,
+}),
 
     Payment.aggregate([
       {
         $match: {
-          status: "paid",
-        },
+  status: PAYMENT_STATUS.SUCCESS,
+},
       },
       {
         $group: {

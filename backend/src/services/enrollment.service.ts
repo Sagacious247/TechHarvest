@@ -13,7 +13,7 @@ export const createEnrollment = async (
   studentId: string,
   courseId: string,
   amount: number,
-  session?: mongoose.ClientSession
+  session: mongoose.ClientSession | null = null
 ) => {
 
   /**
