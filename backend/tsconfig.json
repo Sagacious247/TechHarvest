@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    /* Project */
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    /* Environment */
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+     "jsx": "react-jsx",
+
+    /* TypeScript */
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    /* Performance */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Source Maps */
+    "sourceMap": true,
+
+    /* Types */
+    "types": ["node"],
+
+    /* Global Express Types */
+    "typeRoots": [
+      "./src/types",
+      "./node_modules/@types"
+    ]
+  },
+
+  "include": [
+    "src/**/*"
+  ],
+
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

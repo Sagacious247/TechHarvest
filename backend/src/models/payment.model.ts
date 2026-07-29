@@ -14,9 +14,15 @@ export interface IPayment extends Document {
   reference: string;
 
   status:
-    | typeof PAYMENT_STATUS.PENDING
-    | typeof PAYMENT_STATUS.SUCCESS
-    | typeof PAYMENT_STATUS.FAILED;
+  | typeof PAYMENT_STATUS.PENDING
+  | typeof PAYMENT_STATUS.PROCESSING
+  | typeof PAYMENT_STATUS.SUCCESS
+  | typeof PAYMENT_STATUS.FAILED
+  | typeof PAYMENT_STATUS.ABANDONED
+  | typeof PAYMENT_STATUS.EXPIRED
+  | typeof PAYMENT_STATUS.REFUNDED;
+
+  processing: boolean;
 
   gateway: string;
 
@@ -50,10 +56,14 @@ const paymentSchema = new Schema(
     },
 
     status: {
-      type: String,
-      enum: Object.values(PAYMENT_STATUS),
-      default: PAYMENT_STATUS.PENDING,
-    },
+  type: String,
+  enum: Object.values(PAYMENT_STATUS),
+  default: PAYMENT_STATUS.PENDING,
+},
+    processing: {
+  type: Boolean,
+  default: false,
+},
 
     gateway: {
       type: String,

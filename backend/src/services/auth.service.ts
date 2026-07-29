@@ -1,6 +1,9 @@
 import bcrypt from "bcrypt";
+
 import Admin from "../models/admin.model";
+
 import { generateToken } from "../utils/generateToken";
+import AppError from "../utils/AppError";
 
 export const registerAdmin = async (
   fullName: string,
@@ -8,41 +11,68 @@ export const registerAdmin = async (
   password: string
 ) => {
 
-  const existingAdmin = await Admin.findOne({ email });
+  const existingAdmin = await Admin.findOne({
+    email,
+  });
 
   if (existingAdmin) {
-    throw new Error("Admin already exists.");
+    throw new AppError(
+      "Admin already exists.",
+      409
+    );
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(
+    password,
+    10
+  );
 
   const admin = await Admin.create({
     fullName,
     email,
     password: hashedPassword,
-    role: "super_admin",
+    role: "admin",
   });
 
   const token = generateToken(
     admin._id.toString(),
-    admin.role
+    admin.email,
+    admin.role,
+    "admin"
   );
 
   return {
     admin,
     token,
   };
+
 };
 
 export const loginAdmin = async (
   email: string,
   password: string
+  
 ) => {
 
-  const admin = await Admin.findOne({ email });
+  const admin = await Admin.findOne({
+    email,
+  });
 
   if (!admin) {
-    throw new Error("Invalid email or password.");
+    throw new AppError(
+      "Invalid email or password.",
+      401
+    );
+  }
+
+  /**
+   * Account Status Check
+   */
+  if (admin.status !== "active") {
+    throw new AppError(
+      "Your account has been disabled. Please contact the system administrator.",
+      403
+    );
   }
 
   const isMatch = await bcrypt.compare(
@@ -51,16 +81,29 @@ export const loginAdmin = async (
   );
 
   if (!isMatch) {
-    throw new Error("Invalid email or password.");
+    throw new AppError(
+      "Invalid email or password.",
+      401
+    );
   }
+
+  /**
+   * Update Last Login
+   */
+  admin.lastLogin = new Date();
+
+  await admin.save();
 
   const token = generateToken(
     admin._id.toString(),
-    admin.role
+    admin.email,
+    admin.role,
+    "admin"
   );
 
   return {
     admin,
     token,
   };
+
 };

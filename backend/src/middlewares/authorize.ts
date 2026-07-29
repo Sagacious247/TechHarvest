@@ -1,17 +1,16 @@
-import { Response, NextFunction } from "express";
-import { AuthRequest } from "./authenticate";
+import { Request, Response, NextFunction } from "express";
 
 export const authorize = (
   ...roles: string[]
 ) => {
 
   return (
-    req: AuthRequest,
+    req: Request,
     res: Response,
     next: NextFunction
   ): void => {
 
-    if (!req.admin) {
+    if (!req.user) {
 
       res.status(401).json({
         success: false,
@@ -19,9 +18,10 @@ export const authorize = (
       });
 
       return;
+
     }
 
-    if (!roles.includes(req.admin.role)) {
+    if (!roles.includes(req.user.role)) {
 
       res.status(403).json({
         success: false,
@@ -29,6 +29,7 @@ export const authorize = (
       });
 
       return;
+
     }
 
     next();

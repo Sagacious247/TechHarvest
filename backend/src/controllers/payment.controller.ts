@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+
 import {
   initializePayment,
   verifyPayment,
@@ -7,68 +8,73 @@ import {
 /**
  * Initialize Payment
  */
+
 export const initializePaymentController = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  try {
-    const { enrollmentId } = req.body;
 
-    if (!enrollmentId) {
-      res.status(400).json({
-        success: false,
-        message: "Enrollment ID is required.",
-      });
-      return;
-    }
+  const { enrollmentId } = req.body;
 
-    const result = await initializePayment(enrollmentId);
+  const user = req.user;
 
-    res.status(200).json({
-      success: true,
-      message: "Payment initialized successfully.",
-      data: result,
-    });
-
-  } catch (error: any) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message:
-        error.message || "Unable to initialize payment.",
-    });
+  if (!user) {
+    throw new Error("Unauthorized.");
   }
+
+  if (!enrollmentId) {
+
+    res.status(400).json({
+      success: false,
+      message: "Enrollment ID is required.",
+    });
+
+    return;
+
+  }
+
+  const result = await initializePayment(
+    enrollmentId,
+    user.id
+  );
+
+  res.status(200).json({
+
+    success: true,
+
+    message: result.message,
+
+    data: result,
+
+  });
+
 };
 
 /**
  * Manual Verification
- * Useful during development/testing
  */
 export const verifyPaymentController = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  try {
-    const { reference } = req.params;
 
-    const result = await verifyPayment(reference);
+  const reference = Array.isArray(req.params.reference)
+  ? req.params.reference[0]
+  : req.params.reference;
 
-    res.status(200).json({
-      success: true,
-      message: "Payment verified successfully.",
-      data: result,
-    });
+const result = await verifyPayment(reference);
 
-  } catch (error: any) {
-    console.error(error);
+  res.status(200).json({
 
-    res.status(500).json({
-      success: false,
-      message:
-        error.message || "Verification failed.",
-    });
-  }
+    success: true,
+
+    message:
+      result.message,
+
+    data: result,
+
+  });
+
 };
 
 /**
@@ -81,7 +87,8 @@ export const paystackWebhookController = async (
 
   try {
 
-    const event = JSON.parse(req.body.toString());
+    const event =
+      JSON.parse(req.body.toString());
 
     if (
       event.event === "charge.success"
@@ -93,9 +100,9 @@ export const paystackWebhookController = async (
       await verifyPayment(reference);
 
       console.log(
-        "✅ Payment verified through webhook:",
-        reference
+        `✅ Payment verified: ${reference}`
       );
+
     }
 
     res.sendStatus(200);

@@ -1,12 +1,30 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
+
+import env from "./config/env";
+
+import { errorHandler } from "./middlewares/error.middleware";
+import { apiLimiter } from "./middlewares/rateLimiter";
+import courseContentRoutes from "./routes/courseContent.routes";
 
 import routes from "./routes";
-import paymentRoutes from "./routes/payment.routes";
+
+// ✅ NEW
+import healthRoutes from "./routes/health.routes";
 
 const app = express();
 
-app.use(cors());
+app.use(helmet());
+
+app.use(apiLimiter);
+
+app.use(
+  cors({
+    origin: env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 
 /**
  * Paystack Webhook
@@ -30,14 +48,16 @@ app.get("/", (req, res) => {
   });
 });
 
-/**
- * Register webhook route first
- */
-app.use("/api/payments", paymentRoutes);
+app.use(
+  "/api/course-content",
+  courseContentRoutes
+);
 
-/**
- * Register all remaining routes
- */
+// ✅ Health Check Route
+app.use("/api/health", healthRoutes);
+
 app.use("/api", routes);
+
+app.use(errorHandler);
 
 export default app;

@@ -1,19 +1,36 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, {
+  Schema,
+  Document,
+  Model,
+} from "mongoose";
+
+import bcrypt from "bcrypt";
 
 export interface IStudent extends Document {
   fullName: string;
+
   email: string;
+
+  password: string;
+
   phone: string;
+
   occupation?: string;
+
   experience?: string;
 
-  paymentStatus: string;
-  paymentReference?: string | null;
-  amountPaid: number;
-  paymentDate?: Date | null;
+  emailsSent: boolean;
+
+  status: "active" | "inactive" | "suspended";
+
+  lastLogin?: Date | null;
+
+  comparePassword(
+    password: string
+  ): Promise<boolean>;
 }
 
-const studentSchema = new Schema(
+const studentSchema = new Schema<IStudent>(
   {
     fullName: {
       type: String,
@@ -27,6 +44,18 @@ const studentSchema = new Schema(
       unique: true,
       lowercase: true,
       trim: true,
+    },
+
+     emailsSent: {
+  type: Boolean,
+  default: false,
+},
+
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      select: false,
     },
 
     phone: {
@@ -47,30 +76,61 @@ const studentSchema = new Schema(
       trim: true,
     },
 
-    paymentStatus: {
+    status: {
       type: String,
-      enum: ["pending", "paid"],
-      default: "pending",
+      enum: [
+        "active",
+        "inactive",
+        "suspended",
+      ],
+      default: "active",
     },
 
-    paymentReference: {
-      type: String,
-      default: null,
-    },
-
-    amountPaid: {
-      type: Number,
-      default: 0,
-    },
-
-    paymentDate: {
+    lastLogin: {
       type: Date,
       default: null,
     },
   },
+
   {
     timestamps: true,
   }
 );
 
-export default mongoose.model<IStudent>("Student", studentSchema);
+/**
+ * Hash password before saving
+ */
+studentSchema.pre(
+  "save",
+  async function () {
+    if (!this.isModified("password")) {
+      return;
+    }
+
+    this.password = await bcrypt.hash(
+      this.password,
+      10
+    );
+  }
+);
+
+/**
+ * Compare Password
+ */
+studentSchema.methods.comparePassword =
+  async function (
+    password: string
+  ) {
+    return bcrypt.compare(
+      password,
+      this.password
+    );
+  };
+
+const Student: Model<IStudent> =
+  mongoose.model<IStudent>(
+    "Student",
+    studentSchema
+  );
+
+export default Student;

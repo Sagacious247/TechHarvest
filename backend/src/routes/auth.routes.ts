@@ -1,15 +1,13 @@
-import express from "express";
-import { authorize } from "../middlewares/authorize";
+import express, { Request, Response } from "express";
 
+import { authenticate } from "../middlewares/authenticate";
+import { authorize } from "../middlewares/authorize";
+import { authLimiter } from "../middlewares/rateLimiter";
+import Admin from "../models/admin.model";
 import {
   registerAdminController,
   loginAdminController,
 } from "../controllers/auth.controller";
-
-import {
-  authenticate,
-  AuthRequest,
-} from "../middlewares/authenticate";
 
 const router = express.Router();
 
@@ -20,6 +18,7 @@ router.post(
 
 router.post(
   "/login",
+  authLimiter,
   loginAdminController
 );
 
@@ -27,13 +26,48 @@ router.get(
   "/profile",
   authenticate,
   authorize("super_admin", "admin"),
-  (req: AuthRequest, res) => {
-    res.json({
+  async (req: Request, res: Response) => {
+
+    const admin = await Admin
+      .findById(req.user!.id)
+      .select("-password");
+
+    if (!admin) {
+
+      return res.status(404).json({
+
+        success: false,
+
+        message: "Admin not found.",
+
+      });
+
+    }
+
+    res.status(200).json({
+
       success: true,
-      message: "Authentication & Authorization successful.",
-      admin: req.admin,
+
+      user: admin,
+
     });
+
   }
 );
+
+// router.get(
+//   "/profile",
+//   authenticate,
+//   authorize("super_admin", "admin"),
+//   (req: Request, res: Response) => {
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Authentication & Authorization successful.",
+//       user: req.user,
+//     });
+
+//   }
+// );
 
 export default router;

@@ -1,24 +1,27 @@
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import Stats from "@/components/Stats";
-import WhyTechHarvest from "@/components/WhyTechHarvest";
-import Curriculum from "@/components/Curriculum";
-import Instructor from "@/components/Instructor";
-import Pricing from "@/components/Pricing";
-import Transformation from "@/components/Transformation";
-import WhoShouldAttend from "@/components/WhoShouldAttend";
-import FAQ from "@/components/FAQ";
-import Register from "@/components/Register";
-import FinalCTA from "@/components/FinalCTA";
-import Footer from "@/components/Footer";
+import LandingNavbar from "@/components/landing/LandingNavbar";
+import Hero from "@/components/landing/Hero";
+import Stats from "@/components/landing/Stats";
+import WhyTechHarvest from "@/components/landing/WhyTechHarvest";
+import Curriculum from "@/components/landing/Curriculum";
+import Instructor from "@/components/landing/Instructor";
+import Pricing from "@/components/landing/Pricing";
+import Transformation from "@/components/landing/Transformation";
+import WhoShouldAttend from "@/components/landing/WhoShouldAttend";
+import FAQ from "@/components/landing/FAQ";
+import FinalCTA from "@/components/landing/FinalCTA";
+import Footer from "@/components/landing/Footer";
+import FeaturedCourses from "@/components/landing/FeaturedCourses";
+import Register from "@/components/landing/Register";
+Footer
 
 export default function Home() {
   return (
     <>
-      <Navbar />
+      <LandingNavbar />
       <Hero />
       <Stats/>
       <WhyTechHarvest />
+      <FeaturedCourses/>
       <Curriculum />
       <Instructor />
       <Pricing />

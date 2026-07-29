@@ -1,54 +1,85 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+
 import env from "../config/env";
+import Admin from "../models/admin.model";
+import AppError from "../utils/AppError";
 
-export interface AuthRequest extends Request {
-  admin?: {
-    id: string;
-    role: string;
-  };
-}
-
-export const authenticate = (
-  req: AuthRequest,
+export const authenticate = async (
+  req: Request,
   res: Response,
   next: NextFunction
-): void => {
-
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    res.status(401).json({
-      success: false,
-      message: "Access token is required.",
-    });
-    return;
-  }
-
-  const token = authHeader.startsWith("Bearer ")
-    ? authHeader.substring(7)
-    : authHeader;
+): Promise<void> => {
 
   try {
+
+    const authHeader = req.headers.authorization;
+
+    if (
+      !authHeader ||
+      !authHeader.startsWith("Bearer ")
+    ) {
+      return next(
+        new AppError(
+          "Access token is required.",
+          401
+        )
+      );
+    }
+
+    const token = authHeader.substring(7);
 
     const decoded = jwt.verify(
       token,
       env.JWT_SECRET
-    ) as {
-      id: string;
-      role: string;
-    };
+    ) as Express.UserPayload;
 
-    req.admin = decoded;
+    if (decoded.type !== "admin") {
+      return next(
+        new AppError(
+          "Unauthorized.",
+          401
+        )
+      );
+    }
+
+    const admin = await Admin.findById(decoded.id);
+
+    if (!admin) {
+      return next(
+        new AppError(
+          "Account no longer exists.",
+          401
+        )
+      );
+    }
+
+    if (admin.status !== "active") {
+      return next(
+        new AppError(
+          "Your account has been disabled.",
+          403
+        )
+      );
+    }
+
+    req.user = {
+      id: admin._id.toString(),
+      email: admin.email,
+      role: admin.role,
+      type: "admin",
+    };
 
     next();
 
   } catch {
 
-    res.status(401).json({
-      success: false,
-      message: "Invalid or expired token.",
-    });
+    next(
+      new AppError(
+        "Invalid or expired token.",
+        401
+      )
+    );
 
   }
 

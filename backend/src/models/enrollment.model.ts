@@ -1,21 +1,16 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IEnrollment extends Document {
   student: mongoose.Types.ObjectId;
-
-  course: string;
-
+  course: mongoose.Types.ObjectId;
   amount: number;
-
   status: "pending" | "active" | "cancelled";
-
-  paymentStatus: "pending" | "paid";
-
-  enrolledAt?: Date;
+  enrolledAt?: Date | null;
 }
 
-const enrollmentSchema = new Schema(
+const enrollmentSchema = new Schema<IEnrollment>(
   {
+
     student: {
       type: Schema.Types.ObjectId,
       ref: "Student",
@@ -23,7 +18,8 @@ const enrollmentSchema = new Schema(
     },
 
     course: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "Course",
       required: true,
     },
 
@@ -34,13 +30,11 @@ const enrollmentSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["pending", "active", "cancelled"],
-      default: "pending",
-    },
-
-    paymentStatus: {
-      type: String,
-      enum: ["pending", "paid"],
+      enum: [
+        "pending",
+        "active",
+        "cancelled",
+      ],
       default: "pending",
     },
 
@@ -48,13 +42,31 @@ const enrollmentSchema = new Schema(
       type: Date,
       default: null,
     },
+
   },
   {
     timestamps: true,
   }
 );
 
-export default mongoose.model<IEnrollment>(
-  "Enrollment",
-  enrollmentSchema
+/**
+ * Prevent duplicate enrollment
+ * One student can only enroll in one course once.
+ */
+enrollmentSchema.index(
+  {
+    student: 1,
+    course: 1,
+  },
+  {
+    unique: true,
+  }
 );
+
+const Enrollment: Model<IEnrollment> =
+  mongoose.model<IEnrollment>(
+    "Enrollment",
+    enrollmentSchema
+  );
+
+export default Enrollment;
