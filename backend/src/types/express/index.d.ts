@@ -1,29 +1,20 @@
 import "express";
 
 declare global {
-
   namespace Express {
-
     interface UserPayload {
-
       id: string;
-
       email: string;
 
-      role: "super_admin" | "admin";
+      role: "student" | "admin" | "super_admin";
 
-      type: "admin" | "student";
-
+      type: "student" | "admin";
     }
 
     interface Request {
-
       user?: UserPayload;
-
     }
-
   }
-
 }
 
 export {};
