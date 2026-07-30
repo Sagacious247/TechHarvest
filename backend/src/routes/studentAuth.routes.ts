@@ -2,17 +2,11 @@ import { Router } from "express";
 
 import asyncHandler from "../middlewares/asyncHandler";
 import validate from "../middlewares/validate";
-
 import { loginStudentController } from "../controllers/studentAuth.controller";
-
 import { loginStudentSchema } from "../validators/studentAuth.validator";
-
 import { studentAuthenticate } from "../middlewares/studentAuthenticate";
-
 import { getStudentProfile, updateProfile } from "../controllers/studentProfile.controller";
-
 import { getStudentDashboardController } from "../controllers/dashboard.controller";
-
 import { authLimiter } from "../middlewares/rateLimiter";
 import {
   changePasswordController,
