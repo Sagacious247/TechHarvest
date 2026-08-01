@@ -26,6 +26,7 @@ export default function ModuleDashboardPage() {
   const {
     dashboard,
     loading: dashboardLoading,
+    error
   } = useModuleDashboard(courseId);
 
   const {
@@ -60,17 +61,21 @@ export default function ModuleDashboardPage() {
 
   }
 
-  if (!dashboard) {
+  if (error) {
+  return (
+    <div className="p-10 text-red-600">
+      {error}
+    </div>
+  );
+}
 
-    return (
-      <div className="p-10">
-
-        Course not found.
-
-      </div>
-    );
-
-  }
+if (!dashboard) {
+  return (
+    <div className="p-10">
+      Course not found.
+    </div>
+  );
+}
 
   return (
 
