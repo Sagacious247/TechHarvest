@@ -18,13 +18,11 @@ import {
 const router = Router();
 
 router.get(
-
   "/:courseId",
-
   authenticate,
-
   authorize(
-    "super_admin"
+    "super_admin",
+    "admin"
   ),
 
   asyncHandler(

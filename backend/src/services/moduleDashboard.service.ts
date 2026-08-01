@@ -6,8 +6,12 @@ import Lesson from "../models/lesson.model";
 
 import AppError from "../utils/AppError";
 
+import { checkOwnership } from "../utils/checkOwnership";
+
 export const getModuleDashboard = async (
-  courseId: string
+  courseId: string,
+  adminId: string,
+  role: string
 ) => {
 
   if (!mongoose.isValidObjectId(courseId)) {
@@ -17,15 +21,20 @@ export const getModuleDashboard = async (
     );
   }
 
-  const course =
-    await Course.findById(courseId);
+  const course = await Course.findById(courseId);
 
-  if (!course) {
-    throw new AppError(
-      "Course not found.",
-      404
-    );
-  }
+if (!course) {
+  throw new AppError(
+    "Course not found.",
+    404
+  );
+}
+
+checkOwnership(
+  course.createdBy.toString(),
+  adminId,
+  role
+);
 
   const modules =
     await Module.find({

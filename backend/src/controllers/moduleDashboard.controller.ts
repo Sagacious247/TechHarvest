@@ -16,8 +16,14 @@ async (
     throw new Error("Invalid course id.");
   }
 
-  const dashboard =
-    await getModuleDashboard(courseId);
+  // const dashboard =
+  //   await getModuleDashboard(courseId);
+
+  const dashboard = await getModuleDashboard(
+  courseId,
+  req.user!.id,
+  req.user!.role
+);
 
   res.json({
     success: true,
