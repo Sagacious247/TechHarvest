@@ -27,7 +27,7 @@ const router = express.Router();
 router.post(
   "/",
   authenticate,
-  authorize("super_admin"),
+  authorize("super_admin", "admin"),
   validate(createCourseSchema),
   createCourseController
 );
@@ -46,7 +46,7 @@ router.get(
 router.patch(
   "/:id/publish",
   authenticate,
-  authorize("super_admin"),
+  authorize("super_admin", "admin"),
   publishCourseController
 );
 

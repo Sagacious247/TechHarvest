@@ -15,7 +15,7 @@ const router = Router();
 router.post(
   "/video",
   authenticate,
-  authorize("super_admin"),
+  authorize("super_admin", "admin"),
   upload.single("video"),
   asyncHandler(uploadVideoController)
 );

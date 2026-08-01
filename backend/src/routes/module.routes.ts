@@ -29,7 +29,7 @@ const router = Router();
 router.post(
   "/",
   authenticate,
-  authorize("super_admin"),
+  authorize("super_admin", "admin"),
   validate(createModuleSchema),
   asyncHandler(createModuleController)
 );
@@ -48,21 +48,21 @@ router.get(
 router.patch(
   "/:id",
   authenticate,
-  authorize("super_admin"),
+  authorize("super_admin", "admin"),
   asyncHandler(updateModuleController)
 );
 
 router.delete(
   "/:id",
   authenticate,
-  authorize("super_admin"),
+  authorize("super_admin", "admin"),
   asyncHandler(deleteModuleController)
 );
 
 router.patch(
   "/reorder",
   authenticate,
-  authorize("super_admin"),
+  authorize("super_admin", "admin"),
   asyncHandler(reorderModulesController)
 );
 

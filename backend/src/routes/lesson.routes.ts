@@ -29,7 +29,7 @@ const router = Router();
 router.post(
   "/",
   authenticate,
-  authorize("super_admin"),
+  authorize("super_admin", "admin"),
   validate(createLessonSchema),
   asyncHandler(createLessonController)
 );
@@ -47,7 +47,7 @@ router.get(
 router.put(
   "/:lessonId",
   authenticate,
-  authorize("super_admin"),
+  authorize("super_admin", "admin"),
   validate(createLessonSchema),
   asyncHandler(updateLessonController)
 );
@@ -55,14 +55,14 @@ router.put(
 router.delete(
   "/:lessonId",
   authenticate,
-  authorize("super_admin"),
+  authorize("super_admin", "admin"),
   asyncHandler(deleteLessonController)
 );
 
 router.patch(
   "/:lessonId/publish",
   authenticate,
-  authorize("super_admin"),
+  authorize("super_admin", "admin"),
   asyncHandler(publishLessonController)
 );
 
