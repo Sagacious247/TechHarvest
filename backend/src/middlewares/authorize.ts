@@ -1,27 +1,70 @@
+// import { Request, Response, NextFunction } from "express";
+
+// export const authorize = (
+//   ...roles: string[]
+// ) => {
+
+//   return (
+//     req: Request,
+//     res: Response,
+//     next: NextFunction
+//   ): void => {
+
+//     if (!req.user) {
+
+//       res.status(401).json({
+//         success: false,
+//         message: "Unauthorized.",
+//       });
+
+//       return;
+
+//     }
+
+//     if (!roles.includes(req.user.role)) {
+
+//       res.status(403).json({
+//         success: false,
+//         message: "Forbidden.",
+//       });
+
+//       return;
+
+//     }
+
+//     next();
+
+//   };
+
+// };
+
+
+
 import { Request, Response, NextFunction } from "express";
 
-export const authorize = (
-  ...roles: string[]
-) => {
-
+export const authorize = (...roles: string[]) => {
   return (
     req: Request,
     res: Response,
     next: NextFunction
   ): void => {
 
-    if (!req.user) {
+    console.log("========== AUTHORIZE ==========");
+    console.log("Logged in User:", req.user);
+    console.log("Allowed Roles:", roles);
+    console.log("===============================");
 
+    if (!req.user) {
       res.status(401).json({
         success: false,
         message: "Unauthorized.",
       });
-
       return;
-
     }
 
     if (!roles.includes(req.user.role)) {
+
+      console.log("❌ Authorization Failed");
 
       res.status(403).json({
         success: false,
@@ -29,11 +72,10 @@ export const authorize = (
       });
 
       return;
-
     }
 
+    console.log("✅ Authorization Passed");
+
     next();
-
   };
-
 };
