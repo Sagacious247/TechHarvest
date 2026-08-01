@@ -36,7 +36,7 @@ export default function CourseTable({
           <tr>
 
             <th className="px-6 py-4 text-left">
-              Course
+              Course TESTING
             </th>
 
             <th className="px-6 py-4 text-left">
