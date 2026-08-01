@@ -21,30 +21,16 @@ export const authorize = (
 
     }
 
-    // if (!roles.includes(req.user.role)) {
-
-    //   res.status(403).json({
-    //     success: false,
-    //     message: "Forbidden.",
-    //   });
-
-    //   return;
-
-    // }
-
     if (!roles.includes(req.user.role)) {
 
-  res.status(403).json({
-    success: false,
-    message: "Forbidden.",
-    currentRole: req.user.role,
-    allowedRoles: roles,
-    user: req.user,
-  });
+      res.status(403).json({
+        success: false,
+        message: "Forbidden.",
+      });
 
-  return;
+      return;
 
-}
+    }
 
     next();
 
