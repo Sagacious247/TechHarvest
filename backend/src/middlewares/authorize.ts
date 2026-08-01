@@ -1,42 +1,73 @@
+// import { Request, Response, NextFunction } from "express";
+
+// export const authorize = (
+//   ...roles: string[]
+// ) => {
+
+//   return (
+//     req: Request,
+//     res: Response,
+//     next: NextFunction
+//   ): void => {
+
+//     if (!req.user) {
+
+//       res.status(401).json({
+//         success: false,
+//         message: "Unauthorized.",
+//       });
+
+//       return;
+
+//     }
+
+//     if (!roles.includes(req.user.role)) {
+
+//       res.status(403).json({
+//         success: false,
+//         message: "Forbidden.",
+//       });
+
+//       return;
+
+//     }
+
+//     next();
+
+//   };
+
+// };
+
+
+
 import { Request, Response, NextFunction } from "express";
 
-export const authorize = (
-  ...roles: string[]
-) => {
-
-  return (
+export const authorize =
+  (...roles: string[]) =>
+  (
     req: Request,
     res: Response,
     next: NextFunction
-  ): void => {
+  ) => {
+
+    console.log("========== AUTHORIZE ==========");
+    console.log("Allowed Roles:", roles);
+    console.log("User:", req.user);
+    console.log("===============================");
 
     if (!req.user) {
-
-      res.status(401).json({
+      return res.status(401).json({
         success: false,
-        message: "Unauthorized.",
+        message: "Unauthorized",
       });
-
-      return;
-
     }
 
     if (!roles.includes(req.user.role)) {
-
-      res.status(403).json({
+      return res.status(403).json({
         success: false,
-        message: "Forbidden.",
+        message: "Forbidden",
       });
-
-      return;
-
     }
 
     next();
-
   };
-
-};
-
-
-
