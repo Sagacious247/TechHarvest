@@ -63,25 +63,12 @@ export const authenticate = async (
       );
     }
 
-    // req.user = {
-    //   id: admin._id.toString(),
-    //   email: admin.email,
-    //   role: admin.role,
-    //   type: "admin",
-    // };
-
-    console.log("===== AUTHENTICATE =====");
-console.log("Database role:", admin.role);
-
-req.user = {
-  id: admin._id.toString(),
-  email: admin.email,
-  role: admin.role,
-  type: "admin",
-};
-
-console.log("req.user:", req.user);
-console.log("========================");
+    req.user = {
+      id: admin._id.toString(),
+      email: admin.email,
+      role: admin.role,
+      type: "admin",
+    };
 
     next();
 

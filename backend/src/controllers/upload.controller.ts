@@ -14,12 +14,21 @@ export const uploadVideoController = async (
     );
   }
 
-  const video = await uploadVideo(req.file);
+  try {
+    
+    const video = await uploadVideo(req.file);
+  
+    res.status(200).json({
+      success: true,
+      message: "Video uploaded successfully.",
+      data: video,
+    });
+  } catch (error) {
+    console.error("UPLOAD CONTROLLER ERROR");
+    console.error(error);
 
-  res.status(200).json({
-    success: true,
-    message: "Video uploaded successfully.",
-    data: video,
-  });
+    throw error;
+  }
+
 
 };
