@@ -25,6 +25,9 @@ import adminCourseRoutes from "./adminCourse.routes";
 import adminMediaRoutes
 from "./adminMedia.routes";
 
+import uploadSignatureRoutes
+from "./uploadSignature.routes";
+
 import moduleDashboardRoutes
 from "./moduleDashboard.routes";
 import adminCurriculumRoutes from "./adminCurriculum.routes";
@@ -153,6 +156,11 @@ router.use(
 router.use(
   "/landing-settings",
   landingSettingsRoutes
+);
+
+router.use(
+  "/upload",
+  uploadSignatureRoutes
 );
 
 router.use("/test-email", testEmailRoutes);
