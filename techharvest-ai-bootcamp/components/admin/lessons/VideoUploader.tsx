@@ -40,59 +40,52 @@ export default function VideoUploader({
     useState("");
 
   async function handleSelect(
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
+  e: React.ChangeEvent<HTMLInputElement>
+) {
 
-    const file = e.target.files?.[0];
+  const file = e.target.files?.[0];
 
-    if (!file) return;
+  if (!file) return;
 
-    setFileName(file.name);
+  setFileName(file.name);
 
-    try {
+  try {
 
-      setUploading(true);
+    setUploading(true);
 
-      setProgress(10);
+    setProgress(0);
 
-      /**
-       * Fake progress while waiting
-       */
+    const video = await uploadLessonVideo(
 
-      const timer = setInterval(() => {
+      file,
 
-        setProgress((old) => {
+      (progress) => {
+        setProgress(progress);
+      }
 
-          if (old >= 90) return old;
+    );
 
-          return old + 10;
+    setProgress(100);
 
-        });
+    onUploaded(video);
 
-      }, 400);
+  } catch (err: any) {
 
-      const video =
-        await uploadLessonVideo(file);
+    console.error(err);
 
-      clearInterval(timer);
+    alert(
+      err?.response?.data?.error?.message ||
+      err?.message ||
+      "Video upload failed."
+    );
 
-      setProgress(100);
+  } finally {
 
-      onUploaded(video);
-
-    } catch (err) {
-
-      console.error(err);
-
-      alert("Video upload failed.");
-
-    } finally {
-
-      setUploading(false);
-
-    }
+    setUploading(false);
 
   }
+
+}
 
   return (
 

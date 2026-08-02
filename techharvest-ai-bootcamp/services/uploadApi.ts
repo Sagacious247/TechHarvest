@@ -1,48 +1,105 @@
-// import adminApi from "@/lib/adminApi";
-
-// export async function uploadLessonVideo(file: File) {
-//   const formData = new FormData();
-
-//   formData.append("video", file);
-
-//   const response = await adminApi.post(
-//     "/upload/video",
-//     formData,
-//     {
-//       headers: {
-//         "Content-Type": "multipart/form-data",
-//       },
-//     }
-//   );
-
-//   return response.data.data;
-// }
-
-
+import axios from "axios";
 import adminApi from "@/lib/adminApi";
 
-async function uploadVideo(file: File) {
-  const formData = new FormData();
+interface UploadSignature {
+  timestamp: number;
+  signature: string;
+  folder: string;
+  cloudName: string;
+  apiKey: string;
+}
 
-  formData.append("video", file);
+export interface UploadedVideo {
+  url: string;
+  publicId: string;
+  duration: number;
+}
 
+/**
+ * Get signed upload credentials
+ */
+async function getUploadSignature(): Promise<UploadSignature> {
   const response = await adminApi.post(
-    "/upload/video",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
+    "/upload/signature"
   );
 
   return response.data.data;
 }
 
-export async function uploadLessonVideo(file: File) {
-  return uploadVideo(file);
-}
+/**
+ * Upload directly to Cloudinary
+ */
+export async function uploadLessonVideo(
+  file: File,
+  onProgress?: (progress: number) => void
+): Promise<UploadedVideo> {
 
-export async function uploadLandingVideo(file: File) {
-  return uploadVideo(file);
+  const signature =
+    await getUploadSignature();
+
+  const formData = new FormData();
+
+  formData.append("file", file);
+  formData.append(
+    "api_key",
+    signature.apiKey
+  );
+  formData.append(
+    "timestamp",
+    signature.timestamp.toString()
+  );
+  formData.append(
+    "signature",
+    signature.signature
+  );
+  formData.append(
+    "folder",
+    signature.folder
+  );
+
+  const response = await axios.post(
+
+    `https://api.cloudinary.com/v1_1/${signature.cloudName}/video/upload`,
+
+    formData,
+
+    {
+
+      onUploadProgress(event) {
+
+        if (
+          event.total &&
+          onProgress
+        ) {
+
+          onProgress(
+            Math.round(
+              (event.loaded / event.total) * 100
+            )
+          );
+
+        }
+
+      },
+
+      timeout: 0,
+
+      maxBodyLength: Infinity,
+
+      maxContentLength: Infinity,
+
+    }
+
+  );
+
+  return {
+
+    url: response.data.secure_url,
+
+    publicId: response.data.public_id,
+
+    duration: response.data.duration,
+
+  };
+
 }
