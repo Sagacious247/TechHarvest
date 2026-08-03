@@ -55,15 +55,15 @@ export default function VideoUploader({
 
     setProgress(0);
 
-    console.log("=== NEW CLOUDINARY UPLOADER ===");
+    const video = await uploadLessonVideo(
 
-const video = await uploadLessonVideo(
-  file,
-  (progress) => {
-    console.log("Cloudinary Progress:", progress);
-    setProgress(progress);
-  }
-);
+      file,
+
+      (progress) => {
+        setProgress(progress);
+      }
+
+    );
 
     setProgress(100);
 
