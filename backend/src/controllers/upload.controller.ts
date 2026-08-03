@@ -38,6 +38,7 @@
 import { Request, Response } from "express";
 import { uploadVideo } from "../services/upload.service";
 import AppError from "../utils/AppError";
+import { createMedia } from "../services/media.service";
 
 export const uploadVideoController = async (
   req: Request,
@@ -48,13 +49,19 @@ export const uploadVideoController = async (
       throw new AppError("Please select a video.", 400);
     }
 
-    console.log("Video received:");
-    console.log(req.file.originalname);
-    console.log(req.file.size);
-
     const video = await uploadVideo(req.file);
 
-    console.log("Cloudinary upload success");
+    await createMedia({
+  name: req.file.originalname,
+  url: video.url,
+  publicId: video.publicId,
+  type: "video",
+  format: req.file.mimetype.split("/")[1],
+  size: req.file.size,
+  duration: video.duration,
+  folder: "techharvest/lessons",
+  uploadedBy: req.user!.id,
+});
 
     res.status(200).json({
       success: true,
