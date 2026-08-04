@@ -50,10 +50,11 @@ export const uploadVideoController = async (
     }
 
     const video = await uploadVideo(req.file);
+    console.log("===== SAVING MEDIA =====")
 
     await createMedia({
-  name: req.file.originalname,
-  url: video.url,
+      name: req.file.originalname,
+      url: video.url,
   publicId: video.publicId,
   type: "video",
   format: req.file.mimetype.split("/")[1],
@@ -62,6 +63,7 @@ export const uploadVideoController = async (
   folder: "techharvest/lessons",
   uploadedBy: req.user!.id,
 });
+console.log("===== MEDIA SAVED =====");
 
     res.status(200).json({
       success: true,
