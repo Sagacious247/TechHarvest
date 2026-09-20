@@ -1,0 +1,49 @@
+services:
+
+  qdrant:
+    image: qdrant/qdrant:v1.15.5
+    container_name: techharvest-qdrant
+
+    ports:
+      - "6333:6333"
+
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-bookworm
+    container_name: techharvest-redis
+
+    ports:
+      - "6379:6379"
+
+    restart: unless-stopped
+
+  n8n:
+    container_name: techharvest-n8n
+    image: n8nio/n8n:1.123.5
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - N8N_SECURE_COOKIE=false
+      - TZ=Africa/Lagos
+      - GENERIC_TIMEZONE=Africa/Lagos
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+
+volumes:
+  qdrant_data:
+    name: docker_qdrant_data
+
+  n8n_data:
+    name: techharvest_n8n_data
+
+
+

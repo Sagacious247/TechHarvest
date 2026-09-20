@@ -1,4 +1,9 @@
+import testRoutes from "../ai/routes/test.routes";
 import { Router } from "express";
+import ingestionRoutes from "../ai/routes/index";
+import KnowledgeRoutes from "../ai/routes/index"
+import conversationRoutes from "../routes/index";
+import automationRoutes from "../automation/routes/automation.routes";
 
 import studentRoutes from "./student.routes";
 import studentAuthRoutes from "./studentAuth.routes";
@@ -37,7 +42,7 @@ import adminPaymentHistoryRoutes
 from "./adminPaymentHistory.routes";
 import analyticsRoutes from "./analytics.routes";
 import settingRoutes from "./setting.routes";
-
+import aiRoutes from "../ai/routes";
 import landingSettingsRoutes from "./landingSettings.routes";
 
 import testEmailRoutes from "./testEmail.routes";
@@ -162,6 +167,11 @@ router.use(
   "/upload",
   uploadSignatureRoutes
 );
+
+router.use("/test", testRoutes);
+
+router.use("/ai", aiRoutes);
+router.use("/automation", automationRoutes);
 
 router.use("/test-email", testEmailRoutes);
 

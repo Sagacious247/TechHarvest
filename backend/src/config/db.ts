@@ -3,6 +3,9 @@ import env from "./env";
 
 const connectDB = async () => {
   try {
+    console.log(
+  env.MONGODB_URI?.replace(/:(.*?)@/, ":********@")
+);
     const conn = await mongoose.connect(env.MONGODB_URI);
 
     console.log(

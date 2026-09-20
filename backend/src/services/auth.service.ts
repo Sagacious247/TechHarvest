@@ -58,6 +58,10 @@ export const loginAdmin = async (
     email,
   });
 
+  if (admin) {
+    console.log("Database email:", admin.email);
+  }
+
   if (!admin) {
     throw new AppError(
       "Invalid email or password.",

@@ -34,11 +34,11 @@ export default function AdminLoginForm() {
   const handleSubmit = async (
     e: React.FormEvent
   ) => {
-
+    
     e.preventDefault();
-
+    
     try {
-
+     
       setLoading(true);
 
       setError("");
@@ -58,6 +58,8 @@ export default function AdminLoginForm() {
         "/admin/dashboard"
       );
 
+      
+
     } catch (err: any) {
 
       setError(
@@ -67,6 +69,11 @@ export default function AdminLoginForm() {
         "Invalid email or password."
 
       );
+
+      console.log("EMAIL:", email);
+console.log("PASSWORD:", password);
+
+const response = await loginAdmin(email, password);
 
     } finally {
 

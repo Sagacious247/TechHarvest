@@ -18,6 +18,7 @@
     --foreground: #ededed;
   }
 }
+@import "highlight.js/styles/github-dark.css";
 
 body {
   background: var(--background);

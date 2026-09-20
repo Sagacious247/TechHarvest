@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LogOut, MonitorPlay, X } from "lucide-react";
+import { BrainCircuit, LogOut, MonitorPlay, X } from "lucide-react";
 
 import {
   LayoutDashboard,
@@ -62,6 +62,11 @@ const links = [
     href: "/admin/analytics",
     icon: BarChart3,
   },
+  {
+  title: "AI Studio",
+  href: "/admin/ai",
+  icon: BrainCircuit,
+},
   {
     title: "Settings",
     href: "/admin/settings",
