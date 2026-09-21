@@ -1,0 +1,327 @@
+{
+  "name": "TechHarvest AI Lead Capture",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "techharvest-ai-lead-v2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        0
+      ],
+      "id": "b3f203a0-faf9-4038-9ee3-81ceea170ec0",
+      "name": "Webhook",
+      "webhookId": "4df972b8-5d6c-4dda-be98-ca810b211d8b"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9bd511f-479d-49ba-830c-40fbbc9b8c4d",
+              "name": "fullName",
+              "value": "={{$json.body.fullName}}",
+              "type": "string"
+            },
+            {
+              "id": "5c5a5ab9-f82c-4044-9a89-5d5f08244f11",
+              "name": "email",
+              "value": "={{$json.body.email}}",
+              "type": "string"
+            },
+            {
+              "id": "50cfc78f-3e26-4f45-8b69-04da66e97f06",
+              "name": "phone",
+              "value": "={{$json.body.phone}}",
+              "type": "string"
+            },
+            {
+              "id": "dd6e1daa-8824-4715-8ea8-e635fea98420",
+              "name": "source",
+              "value": "={{$json.body.source}}",
+              "type": "string"
+            },
+            {
+              "id": "8fecf1b3-55b5-42f5-a3b6-832b39b46003",
+              "name": "interest",
+              "value": "={{$json.body.interest}}",
+              "type": "string"
+            },
+            {
+              "id": "9d590884-e71c-43e4-b01c-991a8c73f6c0",
+              "name": "message",
+              "value": "={{$json.body.message}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -384,
+        0
+      ],
+      "id": "528a98e6-975f-4fe0-8234-6e9e3ed18355",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "tableId": "leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "fullName",
+              "fieldValue": "={{$json.fullName}}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{$json.email}}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{$json.phone}}"
+            },
+            {
+              "fieldId": "source",
+              "fieldValue": "={{$json.source}}"
+            },
+            {
+              "fieldId": "interest",
+              "fieldValue": "={{$json.interest}}"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "={{$json.message}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        0
+      ],
+      "id": "d517ffa5-e604-4912-a39a-9bbb9be8c294",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "AQ0ky6bguDEEZkdL",
+          "name": "Supabase account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.6-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.6-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze this TechHarvest lead and qualify the prospect for our sales CRM.\n\nLead information:\n\nName: {{$json.fullName}}\nEmail: {{$json.email}}\nPhone: {{$json.phone}}\nSource: {{$json.source}}\nInterest: {{$json.interest}}\nMessage: {{$json.message}}\n\nDetermine:\n\n1. lead_quality: classify the lead as either \"high\" or \"low\".\n2. intent: classify the buying/business intent as either \"high\" or \"low\".\n3. lead_stage: identify the current stage of the prospect.\n4. summary: give a short explanation of what the prospect wants.\n5. next_action: recommend the most appropriate next sales action.\n6. reply: write a helpful, professional response to the prospect.\n\nImportant:\n- Do not invent information.\n- Use only the information supplied by the lead.\n- Return ONLY valid JSON.\n- Do not use Markdown code fences.\n- Do not include any explanation outside the JSON.\n\nReturn exactly this structure:\n\n{\n  \"lead_quality\": \"high or low\",\n  \"intent\": \"high or low\",\n  \"lead_stage\": \"\",\n  \"summary\": \"\",\n  \"next_action\": \"\",\n  \"reply\": \"\"\n}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        16
+      ],
+      "id": "cf6e01db-4a7f-4ebe-a87b-4ee3cfdc1fb9",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Ikvtm8oFhI9JLcEO",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\n\n// Gemini response is inside content.parts[0].text\nconst text =\n  input?.content?.parts?.[0]?.text ??\n  input?.parts?.[0]?.text ??\n  input?.text ??\n  \"\";\n\nif (!text) {\n  throw new Error(\n    \"Gemini response text could not be found. Check the Gemini node output.\"\n  );\n}\n\n// Remove markdown code fences if Gemini returns them\nconst cleanedText = text\n  .replace(/^```json\\s*/i, \"\")\n  .replace(/^```\\s*/i, \"\")\n  .replace(/\\s*```$/i, \"\")\n  .trim();\n\nlet result;\n\ntry {\n  result = JSON.parse(cleanedText);\n} catch (error) {\n  throw new Error(\n    \"Gemini returned text, but it was not valid JSON.\\n\\nGemini response:\\n\" +\n    cleanedText\n  );\n}\n\nreturn [\n  {\n    json: result\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        0
+      ],
+      "id": "ff986e9f-5271-4a52-adc7-26330fbd1434",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1b51d3ea-0499-4eeb-8a62-fb5a7e46261d",
+              "leftValue": "={{ $json.lead_quality }}",
+              "rightValue": "high",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "fdc9caaf-667e-4051-a2b9-e724b6844c7d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1373630595822662",
+        "recipientPhoneNumber": "+2349059899691",
+        "textBody": "={{ $json.reply }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        656,
+        -96
+      ],
+      "id": "c3a1d08c-6654-42fe-b201-97b27003a2cc",
+      "name": "Send message",
+      "webhookId": "e16b6329-4a99-4264-94ad-bc8359e395a1",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "QXimLWsVoKvns47b",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v25.0/1373630595822662/messages",
+        "authentication": "genericCredentialType",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        656,
+        96
+      ],
+      "id": "8e87e6e5-489c-43cb-a858-628e8856233f",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5ae1bfb1-80ae-4c42-af16-ceacf4368034",
+  "meta": {
+    "instanceId": "3f60edae9fe2903b0ebc3b2d69b13ca024ad94edb0615607073006fbcfd3868f"
+  },
+  "id": "RaqrRiBWPEiqwEay",
+  "tags": []
+}
